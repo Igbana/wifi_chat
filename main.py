@@ -7,9 +7,11 @@ from kivymd.uix.card import MDCard
 from kivy.clock import mainthread
 from kivy.core.window import Window
 from kivy.properties import StringProperty
+from kivymd.utils.set_bars_colors import set_bars_colors
 import socket
 import json
 import threading
+import plyer
 
 Window.softinput_mode = 'below_target'
 
@@ -38,7 +40,7 @@ class LoginPage(MDScreen):
                     threading.Thread(target=self.manager.get_screen('home').receive).start()
             except:
                 print(ip_addr.split(":"))
-                self.error_msg.text = "Invalid IP address"
+                self.error_msg.text = "Please, check IP and try again"
 
 class MessageBox(AnchorLayout):
     sender = StringProperty()
@@ -57,7 +59,12 @@ class HomePage(MDScreen):
 
     @mainthread
     def display_chat(self, message):
-        self.chat_list.add_widget(MessageBox(sender = list(message.keys())[0], message = message[list(message.keys())[0]], anchor_x = 'right' if list(message.keys())[0] == self.nickname_label.text else 'left'))
+        if list(message.keys())[0] != self.nickname_label.text:
+            plyer.notification.notify(title=list(message.keys())[0], message=message[list(message.keys())[0]])
+        newmsg = MessageBox(sender = list(message.keys())[0], message = message[list(message.keys())[0]], anchor_x = 'right' if list(message.keys())[0] == self.nickname_label.text else 'left')
+        self.chat_list.add_widget(newmsg)
+        self.chat_list.parent.scroll_y = 0
+
 
     def send_message(self, message):
         if message == 'xKill':
@@ -73,11 +80,15 @@ class HomePage(MDScreen):
 
 class MainApp(MDApp):    
     def build(self):
-        self.theme_cls.theme_style = 'Dark'
+        self.theme_cls.theme_style = 'Dark'    
         sm = ScreenManager()
         sm.add_widget(LoginPage())
         sm.add_widget(HomePage())
+        self.set_bars_colors()
         return sm
+    
+    def set_bars_colors(self):
+        set_bars_colors([0,0,0.1,1], [0,0,0.1,1], "Dark")
 
 MainApp().run()
 try:
