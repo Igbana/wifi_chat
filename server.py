@@ -34,7 +34,7 @@ def handle_connection(client):
                 broadcast(f'{{"{clients[client]}": "{message}"}}'.encode())
         except Exception as e:
             usr = clients[client]
-            del usr
+            del clients[client]
             broadcast(f"{usr} left the chat!".encode())
             print('Stopped')
             stop = True

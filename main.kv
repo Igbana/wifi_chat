@@ -27,6 +27,7 @@
     name: 'login'
     md_bg_color: [0,0,0.3,1]
     nickname_text: nickname_text
+    ip_text: ip_text
     error_msg: error_msg
     MDBoxLayout:
         orientation: 'vertical'
@@ -36,13 +37,15 @@
         pos_hint: {'center_x': 0.5,'center_y': 0.6}
         MDLabel:
             text: "Login"
-            halign: 'center'
             font_size: sp(46)
             size_hint_y: None
             height: dp(80)
         MDTextField:
             id: nickname_text
             hint_text: 'Nickname'
+        MDTextField:
+            id: ip_text
+            hint_text: 'IP_Address:port'
         MDLabel:
             id: error_msg
             halign: 'center'
@@ -51,7 +54,7 @@
             text: "Login"
             pos_hint: {'right': 1.0}
             on_release:
-                root.login(nickname_text.text)
+                root.login(nickname_text.text, ip_text.text)
                 
 
 <HomePage>:
@@ -60,7 +63,9 @@
     nickname_label: nickname_label
     message_text: message_text
     chat_list: chat_list
-    on_leave: self.close_connection()
+    on_leave:
+        self.chat_list.clear_widgets()
+        self.close_connection()
     MDBoxLayout:
         orientation: 'vertical'
         MDCard:
@@ -92,4 +97,6 @@
                 hint_text: 'Write a message'
             MDIconButton:
                 icon: 'send'
-                on_release: root.send_message(message_text.text)
+                on_release:
+                    root.send_message(message_text.text)
+                    message_text.text = ""

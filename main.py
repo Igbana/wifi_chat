@@ -5,30 +5,40 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivymd.uix.card import MDCard
 from kivy.clock import mainthread
+from kivy.core.window import Window
 from kivy.properties import StringProperty
 import socket
 import json
 import threading
+
+Window.softinput_mode = 'below_target'
 
 
 class LoginPage(MDScreen):
     def __init__(self):
         super(LoginPage, self).__init__()
 
-    def login(self, nickname):
-        if nickname == "":
-            self.error_msg.text = "Name cannot be empty"
+    def login(self, nickname, ip_addr):
+        if nickname == "" and ip_addr == "":
+            self.error_msg.text = "Fields cannot be empty"
+        elif len(ip_addr.split(":")) != 2:
+            print(ip_addr.split(":"))
+            self.error_msg.text = "Invalid IP address ..."
         else:
             global client
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client.connect(('127.0.0.1', 9999))
-            message = client.recv(1024).decode()
-            if message == "NICK":
-                client.send(self.nickname_text.text.encode())
-                self.manager.get_screen('home').nickname_label.text = nickname
-                self.manager.transition.direction = 'left'
-                self.manager.current = 'home'
-                threading.Thread(target=self.manager.get_screen('home').receive).start()
+            try:
+                client.connect((ip_addr.split(':')[0], int(ip_addr.split(':')[1])))
+                message = client.recv(1024).decode()
+                if message == "NICK":
+                    client.send(self.nickname_text.text.encode())
+                    self.manager.get_screen('home').nickname_label.text = nickname
+                    self.manager.transition.direction = 'left'
+                    self.manager.current = 'home'
+                    threading.Thread(target=self.manager.get_screen('home').receive).start()
+            except:
+                print(ip_addr.split(":"))
+                self.error_msg.text = "Invalid IP address"
 
 class MessageBox(AnchorLayout):
     sender = StringProperty()
