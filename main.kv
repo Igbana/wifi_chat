@@ -1,0 +1,95 @@
+#:import Window kivy.core.window.Window
+
+<MessageBox>:
+    size_hint_y: None
+    height: lbl.height+dp(30)
+    MDCard:
+        md_bg_color: [0.8,0.6,0,1]
+        size_hint_x: 0.7
+        padding: dp(8), dp(0)
+        MDBoxLayout:
+            orientation: 'vertical'
+            pos_hint: {'center_y': 0.5}
+            adaptive_height: True
+            spacing: dp(4)
+            MDLabel:
+                text: root.sender
+                font_size: sp(12)
+                color: [0,0,0.3,1]
+                adaptive_height: True
+            MDLabel:
+                id: lbl
+                text: root.message
+                adaptive_height: True
+                pos_hint: {'center_y': 0.5}
+
+<LoginPage>:
+    name: 'login'
+    md_bg_color: [0,0,0.3,1]
+    nickname_text: nickname_text
+    error_msg: error_msg
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        size_hint_x: 0.8
+        spacing: dp(24)
+        pos_hint: {'center_x': 0.5,'center_y': 0.6}
+        MDLabel:
+            text: "Login"
+            halign: 'center'
+            font_size: sp(46)
+            size_hint_y: None
+            height: dp(80)
+        MDTextField:
+            id: nickname_text
+            hint_text: 'Nickname'
+        MDLabel:
+            id: error_msg
+            halign: 'center'
+            color: 1,0,0,1
+        MDRaisedButton:
+            text: "Login"
+            pos_hint: {'right': 1.0}
+            on_release:
+                root.login(nickname_text.text)
+                
+
+<HomePage>:
+    name: 'home'
+    md_bg_color: [0,0,0.3,1]
+    nickname_label: nickname_label
+    message_text: message_text
+    chat_list: chat_list
+    on_leave: self.close_connection()
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDCard:
+            size_hint_y: None
+            height: dp(50)
+            md_bg_color: [0,0,0.1,1]
+            MDBoxLayout:
+                MDLabel:
+                    id: nickname_label
+                    padding: dp(20), 0
+                    bold: True
+                    font_size: sp(24)
+                MDIconButton:
+                    icon: 'logout'
+                    pos_hint: {'right': 1.0,'center_y': 0.5}
+                    on_release:
+                        root.manager.transition.direction = 'right'
+                        root.manager.current = 'login'
+        ScrollView:
+            MDList:
+                id: chat_list
+                padding: dp(10)
+                spacing: dp(20)
+        MDBoxLayout:
+            padding: dp(10), dp(0)
+            adaptive_height: True
+            MDTextField:
+                id: message_text
+                hint_text: 'Write a message'
+            MDIconButton:
+                icon: 'send'
+                on_release: root.send_message(message_text.text)
